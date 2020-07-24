@@ -1,0 +1,192 @@
+---
+title: "LinearRegression_OLS_basics"
+author: "Madlen Wilmes"
+date: "7/24/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(tsibble)
+library(lubridate) # handle date information
+library(ggpmisc) # plot R^2 in scatter plot
+library(broom)
+```
+
+<!-- wp:paragraph -->
+So, you think you know linear regression? I have likely run thousands of regression models as a researcher and data analyst. However, a recent job interview made me think about some finer details of linear regression. As a consequence, I wanted to brush up on the topic. The outcome is a series of posts on linear regression. This is the first part and provides the foundations of linear regression.
+<!-- /wp:paragraph -->
+
+<!-- wp:more -->
+<!--more-->
+<!-- /wp:more -->
+
+<!-- wp:getwid/advanced-heading {"titleTag":"h3"} -->
+<div class="wp-block-getwid-advanced-heading"><h3 class="wp-block-getwid-advanced-heading__content">What is linear regression?
+</h3></div>
+<!-- /wp:getwid/advanced-heading -->
+
+<!-- wp:paragraph -->
+Linear regression describes the nature and strenght of the relationship among variables. Here, we assume the simplest case: two continous variables. **Continuous variables** can take on any value between its minimal and maximal value. If the data can only take on specific values, we speak of a **discrete variable**. For guidance on how to select the right regression model (depending on the kind of variables), check out this guide by [Statistics with Jim](https://statisticsbyjim.com/regression/choosing-regression-analysis/).
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+Back to our simple case of two continuous variables. We call one variable $X$ and the other one $Y$. By convention, $Y$ is the variable that we want to predict. It is called the **response** or **dependent variable**, and $X$ is called the **predictor** or **independent variable**. 
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+The goal of regression is to find a formula (i.e., mathematical model) that defines $Y$ as a function of $X$. In other words, **regression** estimates the relationship between our input variable $X$ and our response variable $Y$. Once we have a formula describing the relationship of $X$ and $Y$, we can also predict future outcomes (e.g., conduct a **forecast** using new values of $X$.)
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+First, let's plot the relationship of $X$ and $Y$ in a scatterplot. Note that this tutorial uses dummy variables to keep the focus on the mechanics, not the findings.
+<!-- /wp:paragraph -->
+
+```{r get and modify data, echo=FALSE}
+dat <- iris %>% filter(Species=="virginica")
+dat <- dat %>% group_by(Petal.Length) %>% summarise(y = mean(Sepal.Length), x = mean(Petal.Length), .groups='keep') %>% filter(x > 4.6)
+dat <- dat[,-1]
+```
+
+
+```{r dist by speed, echo=FALSE, warning=FALSE, out.width='1200px', dpi=100}
+dat %>% 
+  ggplot() +
+  aes(x,y) +
+    ylab("Response (Y)") +
+    xlab("Predictor (X)") +
+    geom_point() +
+  ggtitle("Relationship of X and Y") +
+  theme_bw()
+```
+
+<!-- wp:paragraph -->
+Next, we want to plot a line that more clearly shows the relationship of $X$ and $Y$. More precisely, we want to plot the best-fit line, also called a regression line. 
+<!-- /wp:paragraph -->
+
+
+```{r plot with regression line, echo=FALSE}
+dat %>%
+  ggplot() +
+  aes(x, y) +
+    ylab("Response (Y)") +
+    xlab("Predictor (X)") +
+    geom_smooth(method="lm", formula = "y ~ x", se=FALSE, fullrange=TRUE, color="#0442BF") +
+  geom_point() +
+  ggtitle("Relationship of x and y, with regression line") +
+  theme_bw()
+```
+
+
+<!-- wp:paragraph -->
+Mathematically, such a regression line is described as $ latex \hat{Y_i} = \beta_0 + \beta_1 X_i + \epsilon$.
+
+Let's look at that piece by piece:
+
+* $\hat{Y_i}$ is the predicted value for the $i^{th}$ observation
+* $X_i$ is our predictor variable for the $i^{th}$ observation
+* $\beta_0$ is the intercept of the regression line (i.e., the predicted value of $\hat{y}$ when $x = 0$);
+* $\beta_1$ is the slope of the regression line
+* $\epsilon_i$ is the error term, or residual error for the $i^{th}$ observation
+
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+Note that $\beta_0$ and $\beta_1$ are also called the coefficients or parameters of the regression model. These coefficients need to be estimated from the data.
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+I'll plot the same graphics again but highlight some elements, which will help us understand the above definition of a linear regression model.
+<!-- /wp:paragraph -->
+
+```{r fit linear model, echo=FALSE, include=FALSE}
+fit <- lm(y ~ x, data = dat)
+tidy(fit)
+```
+
+
+```{r get resid and predict, echo=FALSE, include=FALSE}
+dat$predicted <- predict(fit)   # Save the predicted values
+dat$residuals <- residuals(fit) # Save the residual values
+summary(fit) # beta_0 --> Intercept Estimate, beta_1 --> Petal.Length Estimate
+# glance(fit) # output tidy version
+```
+
+
+```{r plot with regression line and residuals, echo=FALSE}
+dat %>%
+  ggplot() +
+  aes(x, y) +
+    ylab("Response (Y)") +
+    xlab("Predictor (X)") +
+    geom_smooth(method="lm", formula="y ~ x", se=FALSE, fullrange=TRUE, color="#0442BF") +
+  geom_point(aes(y = predicted), color = "#F27E63", shape=1) +
+  geom_segment(aes(xend = x, yend = predicted), color="#C8D0D9") +
+  geom_point() +
+  ggtitle("Relationship of x and y") +
+  theme_bw()
+```
+
+<!-- wp:paragraph -->
+We still see the actual data points in black. Note how they deviate from the blue regression line by varying extent. Some points are closer to the line, others farther away. Some are below, others above the regression line. The extent by which each data point deviates from the line, is called the residual error ($\epsilon_i$). In the above image, the $\epsilon_i$ for each data point is shown as a vertical, gray line.  
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+The residual error is calculated by $\epsilon_i = Y_i - \hat{Y_i}$, where $Y_i$ is the actual data point at the $i^{th}$ oberservation and $\hat{Y_i}$ is the predicted value of the $i^{th}$ observation. The predicted values $\hat{y_i}$ are shown as pink circles. You can think of $\hat{y_i}$ as the value that $Y_i$ should have according to our model if there was no error. That in turn, means that $\epsilon$ is the part of each $Y_i$ that cannot be explained by the model.
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+So how did we actually find the regression line? The nerdy answer is: by minimizing the **sum of squared errors (SSE)**. 
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+In 'math speak' that is: By minimizing $\sum_i(Y_i-\hat{Y_i})^2 = \sum \epsilon_i^2$.
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+In plain English, that translates to: For each data point, calculate the squared difference of the actual data point and its predicted value (i.e., $(Y_i-\hat{Y_i})^2$). Then sum them up over all $Y_i$ to obtain the sum of squared errors ($SSE$).
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+This explains why linear regressing that minimizes $SSE$ is also called **ordinary least squares (OLS) regression**.
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+To make it a bit more confusing, the sum of squared errors ($SSE$), are also known as sum of squared residuals ($SSR$), residual sum of squares ($RSS$, $SS_{res}$), or the sum of squared estimate of errors ($SSE$).
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+Note that there are other ways to find a 'best-fit-line'. That means, you can define what 'best-fit' means. OLS minimizes $SSE$ but that actually makes it sensitive to outliers (i.e., a data point that strongly deviates from all other data points) may strongly influence the model. The culprit is the fact that we square the errors, which means large errors receive more weight than small ones. By optimizing a different criterion (also called **Loss function**), you will end up with a different 'best-fit' and possibly 'better', or more robust, model to describe your data. [More on that below](#more_on_loss).
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+Once the Loess function is optimized, we can retrieve $\beta_0$ and $\beta_1$ from our model.
+<!-- /wp:paragraph -->
+
+```{r plot with residuals; regression line; and formula, echo=FALSE}
+dat %>%
+  ggplot() +
+  aes(x, y) +
+    ylab("Response (Y)") +
+    xlab("Predictor (X)") +
+    geom_smooth(method="lm", formula="y~x", se=FALSE, fullrange=TRUE, color="#0442BF") +
+    stat_poly_eq(formula = y ~ x,
+                eq.with.lhs = "italic(hat(y))~`=`~",
+                aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                parse = TRUE)  +
+  geom_point(aes(y = predicted), color = "#F27E63", shape=1) +
+  geom_segment(aes(xend = x, yend = predicted), color="#C8D0D9") +
+  geom_point() +
+  ggtitle("Relationship of X and Y") +
+  theme_bw()
+```
+
+
+<!-- wp:paragraph -->
+The formula of the regression line gives us some information about the relationship of $X$ and $Y$. Our intercept estimate ($\beta_0$) is 1.51. That means, when our $X$ is zero, $Y$ is 1.51. The line's slope ($\beta_1$) tells us that with every one unit change in $X$, causes an average 0.925 change in $Y$.
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+This brings us to the end of the basics. Next, we'll look at some finer details of linear regression.
+<!-- /wp:paragraph -->

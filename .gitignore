@@ -1,5 +1,5 @@
-# images
-img/
+# exclude R.publish file
+publish.R
 
 # History files
 .Rhistory
