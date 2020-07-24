@@ -2,7 +2,8 @@
 title: "LinearRegression_OLS_basics"
 author: "Madlen Wilmes"
 date: "7/24/2020"
-output: html_document
+output: 
+  html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -12,6 +13,7 @@ library(tsibble)
 library(lubridate) # handle date information
 library(ggpmisc) # plot R^2 in scatter plot
 library(broom)
+library(knitr)
 ```
 
 <!-- wp:paragraph -->
@@ -50,7 +52,7 @@ dat <- dat[,-1]
 ```
 
 
-```{r dist by speed, echo=FALSE, warning=FALSE, out.width='1200px', dpi=100}
+```{r plain X by Y, include=FALSE, warning=FALSE, out.width='1200px', dpi=100}
 dat %>% 
   ggplot() +
   aes(x,y) +
@@ -59,6 +61,12 @@ dat %>%
     geom_point() +
   ggtitle("Relationship of X and Y") +
   theme_bw()
+ggsave("./img/X_versus_Y_plain.jpg", dpi = 320,  width = 5, height = 3, units = c("in"))
+```
+
+
+```{r include plain X by Y, echo=FALSE, warning=FALSE}
+include_graphics("https://github.com/mmwilmes/Linear_regression_foundation/raw/master/img/X_versus_Y_plain.jpg") 
 ```
 
 <!-- wp:paragraph -->
@@ -66,7 +74,7 @@ Next, we want to plot a line that more clearly shows the relationship of $X$ and
 <!-- /wp:paragraph -->
 
 
-```{r plot with regression line, echo=FALSE}
+```{r plot with regression line, echo=FALSE, out.width='1200px', dpi=100}
 dat %>%
   ggplot() +
   aes(x, y) +
@@ -74,13 +82,18 @@ dat %>%
     xlab("Predictor (X)") +
     geom_smooth(method="lm", formula = "y ~ x", se=FALSE, fullrange=TRUE, color="#0442BF") +
   geom_point() +
-  ggtitle("Relationship of x and y, with regression line") +
+  ggtitle("Relationship of X and Y, with regression line") +
   theme_bw()
+ggsave("./img/X_versus_Y_with_line.jpg", dpi = 320,  width = 5, height = 3, units = c("in"))
+```
+
+```{r include Y~X with line, echo=FALSE, warning=FALSE}
+# include_graphics("https://github.com/mmwilmes/Linear_regression_foundation/raw/master/img/X_versus_Y_with_line.jpg") 
 ```
 
 
 <!-- wp:paragraph -->
-Mathematically, such a regression line is described as $ latex \hat{Y_i} = \beta_0 + \beta_1 X_i + \epsilon$.
+Mathematically, such a regression line is described as $\hat{Y_i} = \beta_0 + \beta_1 X_i + \epsilon_i$.
 
 Let's look at that piece by piece:
 
@@ -114,7 +127,7 @@ summary(fit) # beta_0 --> Intercept Estimate, beta_1 --> Petal.Length Estimate
 ```
 
 
-```{r plot with regression line and residuals, echo=FALSE}
+```{r plot with regression line and residuals, echo=FALSE, out.width='1200px', dpi=100}
 dat %>%
   ggplot() +
   aes(x, y) +
@@ -124,8 +137,13 @@ dat %>%
   geom_point(aes(y = predicted), color = "#F27E63", shape=1) +
   geom_segment(aes(xend = x, yend = predicted), color="#C8D0D9") +
   geom_point() +
-  ggtitle("Relationship of x and y") +
+  ggtitle("Relationship of X and Y with residuals") +
   theme_bw()
+ggsave("./img/X_versus_Y_with_line_and_res.jpg", dpi = 320,  width = 5, height = 3, units = c("in"))
+```
+
+```{r include Y~X with line and res, echo=FALSE, warning=FALSE}
+# include_graphics("https://github.com/mmwilmes/Linear_regression_foundation/raw/master/img/X_versus_Y_with_line_and_res.jpg") 
 ```
 
 <!-- wp:paragraph -->
@@ -157,14 +175,14 @@ To make it a bit more confusing, the sum of squared errors ($SSE$), are also kno
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-Note that there are other ways to find a 'best-fit-line'. That means, you can define what 'best-fit' means. OLS minimizes $SSE$ but that actually makes it sensitive to outliers (i.e., a data point that strongly deviates from all other data points) may strongly influence the model. The culprit is the fact that we square the errors, which means large errors receive more weight than small ones. By optimizing a different criterion (also called **Loss function**), you will end up with a different 'best-fit' and possibly 'better', or more robust, model to describe your data. [More on that below](#more_on_loss).
+Note that there are other ways to find a 'best-fit-line'. That means, you can define what 'best-fit' means. OLS minimizes $SSE$ but that actually makes it sensitive to outliers (i.e., a data point that strongly deviates from all other data points) may strongly influence the model. The culprit is the fact that we square the errors, which means large errors receive more weight than small ones. By optimizing a different criterion (also called **Loss function**), you will end up with a different 'best-fit' and possibly 'better', or more robust, model to describe your data.
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-Once the Loess function is optimized, we can retrieve $\beta_0$ and $\beta_1$ from our model.
+Once your algorithm optimized according to the Loess function and identified the best-fit model, we can retrieve $\beta_0$ and $\beta_1$.
 <!-- /wp:paragraph -->
 
-```{r plot with residuals; regression line; and formula, echo=FALSE}
+```{r plot with residuals; regression line; and formula, echo=FALSE, out.width='1200px', dpi=100}
 dat %>%
   ggplot() +
   aes(x, y) +
@@ -180,6 +198,11 @@ dat %>%
   geom_point() +
   ggtitle("Relationship of X and Y") +
   theme_bw()
+ggsave("./img/X_versus_Y_with_line_res_formula.jpg", dpi = 320,  width = 5, height = 3, units = c("in"))
+```
+
+```{r include Y~X with line res and formula, echo=FALSE, warning=FALSE}
+# include_graphics("https://github.com/mmwilmes/Linear_regression_foundation/raw/master/img/X_versus_Y_with_line_res_formula.jpg") 
 ```
 
 
@@ -188,5 +211,5 @@ The formula of the regression line gives us some information about the relations
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-This brings us to the end of the basics. Next, we'll look at some finer details of linear regression.
+This brings us to the end of the linear regression basics. In the next post, we'll look at the assumptions that underly linear regression, see how to test them, learn when it's (not) OK to ignore them, and how to transform your data to make them comply to the linear regression assumptions.
 <!-- /wp:paragraph -->
