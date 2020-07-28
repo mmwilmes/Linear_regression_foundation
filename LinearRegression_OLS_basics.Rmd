@@ -81,7 +81,7 @@ ggsave("./img/X_versus_Y_plain.jpg", dpi = 320,  width = 5, height = 3, units = 
 <!-- /wp:getwid/advanced-heading -->
 
 <!-- wp:paragraph -->
-Linear regression describes the relationship of two variables. We can visualize such a relationship by a straight line through the data.
+Linear regression describes the relationship of two variables. We can visualize such a relationship by a straight line.
 <!-- /wp:paragraph -->
 
 
@@ -90,9 +90,9 @@ Mathematically, a line is described as $\hat{Y} = \beta_0 + \beta_1 X$.
 
 No need to get scared. Let's go through the formula piece by piece:
 
-* $\hat{Y}$ is the predicted value at the given value of $X$ (i.e., what we want to identify)
-* $\beta_1$ is the slope of the line (i.e., how steep is the line)
-* $\beta_0$ is the intercept of the line (i.e., the predicted value of $\hat{y}$ when $x = 0$)
+* $\hat{Y}$ is the predicted value at the given value of $X$ (i.e., what we want to determine)
+* $\beta_1$ is the slope of the line (i.e., steepness of the line)
+* $\beta_0$ is the intercept of the line (i.e., the predicted value of $\hat{Y}$ when $X = 0$)
 * $X$ is the value of the predictor variable
 
 <!-- /wp:paragraph -->
@@ -102,7 +102,7 @@ Note that $\beta_0$ and $\beta_1$ are called the coefficients or parameters of t
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-For instance, we could try to draw a straight line that goes through as many data points as possible. Or we could draw a line that has as many data values above it as there are below it. These are all valid critera.
+For instance, we could try to draw a straight line that goes through as many data points as possible. Or we could draw a line that has an approximately equal number of data points above and below.
 <!-- /wp:paragraph -->
 
 
@@ -176,7 +176,7 @@ In the image, we see a blue regression line through the data. Some data points a
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-The residual error is calculated by $\epsilon_i = Y_i - \hat{Y_i}$, where $Y_i$ is the actual data point at the $i^{th}$ observation, and $\hat{Y_i}$ is the predicted value of the $i^{th}$ observation. The predicted values $\hat{Y_i}$ are shown as pink circles in our graph. You can think of $\hat{Y_i}$ as the value that $Y_i$ should have according to our model if there was no error.
+The residual error is calculated by $\epsilon_i = Y_i - \hat{Y_i}$, where $Y_i$ is the actual data point at the $i^{th}$ observation, and $\hat{Y_i}$ is the predicted value of the $i^{th}$ observation. The predicted values $\hat{Y_i}$ are shown as pink circles in our graph. You can think of $\hat{Y_i}$ as the value that $Y_i$ should have according to our model if there was no error. In turn, it means that $\epsilon$ is the part of each $Y_i$ that cannot be explained by the model.
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -198,7 +198,7 @@ As mentioned above, we can fit different linear regression models to the data. T
 <!-- /wp:getwid/advanced-heading -->
 
 <!-- wp:paragraph -->
-The formula of the regression line ($\hat Y = 1.51 + 0.925*X$) gives us some information about the relationship of $X$ and $Y$. First of all, it is linear (no quadratic terms, etc.). Our intercept estimate ($\beta_0$) is 1.51. That means, when our $X$ is zero, $Y$ is 1.51. The line's slope ($\beta_1$) tells us that every one unit change in $X$, causes an average 0.925 change in $Y$.
+The formula of the regression line ($\hat Y = -0.331 + 0.925*X$) gives us some information about the relationship of $X$ and $Y$. First of all, it is linear (no quadratic terms, etc.). Our intercept estimate ($\beta_0$) is -0.331. That means, when our $X$ is zero, $Y$ is -0.331. The line's slope ($\beta_1$) tells us that every one unit change in $X$, causes an average 0.925 change in $Y$.
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
