@@ -1,3 +1,8 @@
+# exclude miscellaneous files
+*.html
+strategy.txt
+LinearRegression_scrap.Rmd
+
 # exclude R.publish file
 publish.R
 
